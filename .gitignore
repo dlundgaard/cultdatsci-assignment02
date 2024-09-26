@@ -1,4 +1,5 @@
 /*
 !.gitignore
-!fun_with_pandas.ipynb
+!*.ipynb
+!*.md
 !minimal.mplstyle
