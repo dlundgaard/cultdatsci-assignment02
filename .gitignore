@@ -2,4 +2,5 @@
 !.gitignore
 !*.ipynb
 !*.md
+!*_files
 !minimal.mplstyle
