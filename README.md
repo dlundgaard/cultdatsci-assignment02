@@ -119,7 +119,7 @@ dataset
       <td>"Grenade"</td>
       <td>2010</td>
       <td>10.2</td>
-      <td>[67]</td>
+      <td>[68]</td>
       <td>digital</td>
     </tr>
     <tr>
@@ -128,7 +128,7 @@ dataset
       <td>"I Took a Pill in Ibiza"</td>
       <td>2015</td>
       <td>10[a]</td>
-      <td>[50]</td>
+      <td>[51]</td>
       <td>digital</td>
     </tr>
     <tr>
@@ -137,7 +137,7 @@ dataset
       <td>"Waka Waka (This Time for Africa)"</td>
       <td>2010</td>
       <td>10</td>
-      <td>[76]</td>
+      <td>[77]</td>
       <td>digital</td>
     </tr>
     <tr>
@@ -146,7 +146,7 @@ dataset
       <td>"Hips Don't Lie"</td>
       <td>2006</td>
       <td>10</td>
-      <td>[77]</td>
+      <td>[78]</td>
       <td>digital</td>
     </tr>
     <tr>
@@ -155,7 +155,7 @@ dataset
       <td>"Just Dance"</td>
       <td>2008</td>
       <td>10</td>
-      <td>[78]</td>
+      <td>[79]</td>
       <td>digital</td>
     </tr>
   </tbody>
@@ -477,26 +477,89 @@ dataset.value_counts("Month").idxmax()
 
 
 ```python
-dataset.value_counts("Month")
+dataset.value_counts("Month").rename("Occurences").to_frame()
 ```
 
 
 
 
-    Month
-    November     30
-    August       27
-    October      22
-    September    22
-    July         21
-    December     19
-    January      19
-    May          17
-    March        15
-    February     14
-    June         14
-    April        13
-    dtype: int64
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Occurences</th>
+    </tr>
+    <tr>
+      <th>Month</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>November</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>August</th>
+      <td>27</td>
+    </tr>
+    <tr>
+      <th>October</th>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>September</th>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>July</th>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>December</th>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>January</th>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>May</th>
+      <td>17</td>
+    </tr>
+    <tr>
+      <th>March</th>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>February</th>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>June</th>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>April</th>
+      <td>13</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
@@ -667,28 +730,7 @@ dataset
 
 
 ```python
-dataset["Decade"].value_counts()
-```
-
-
-
-
-    1960s    228
-    1970s     97
-    1980s     92
-    1990s     84
-    2000s     49
-    1940s     47
-    1950s     26
-    2010s      9
-    1930s      4
-    Name: Decade, dtype: int64
-
-
-
-
-```python
-dataset.groupby("Company")["Character / Team"].count().sort_values(ascending = False).to_frame().rename(columns = {"Character / Team": "Supervillains"})
+dataset["Decade"].value_counts().rename("Debuts").to_frame()
 ```
 
 
@@ -712,7 +754,79 @@ dataset.groupby("Company")["Character / Team"].count().sort_values(ascending = F
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Supervillains</th>
+      <th>Debuts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1960s</th>
+      <td>228</td>
+    </tr>
+    <tr>
+      <th>1970s</th>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>1980s</th>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>1990s</th>
+      <td>84</td>
+    </tr>
+    <tr>
+      <th>2000s</th>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>1940s</th>
+      <td>47</td>
+    </tr>
+    <tr>
+      <th>1950s</th>
+      <td>26</td>
+    </tr>
+    <tr>
+      <th>2010s</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>1930s</th>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+dataset.groupby("Company")["Character / Team"].count().sort_values(ascending = False).rename("Characters").to_frame()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Characters</th>
     </tr>
     <tr>
       <th>Company</th>
@@ -917,7 +1031,11 @@ dataset
 
 
 ```python
-dataset_long = pd.melt(dataset.reset_index(names = "Participant_ID"), id_vars=("Participant_ID", "Year")).rename(columns = dict(variable = "Task", value = "RT"))
+dataset_long = pd.melt(
+    dataset.reset_index(names = "Participant_ID"), 
+    id_vars=("Participant_ID", "Year")
+).rename(columns = dict(variable = "Task", value = "RT"))
+
 dataset_long
 ```
 
@@ -1203,6 +1321,7 @@ plt.style.use("minimal.mplstyle")
 
 for task, data in mean_response_times.reset_index(level = 1).groupby("Task"):
     plt.plot(data["Year"], data["RT"], label = task)
+
 plt.legend(
     loc = "lower center", 
     bbox_to_anchor = (0.5, 1.02), 
@@ -1218,6 +1337,6 @@ plt.show()
 
 
     
-![png](fun_with_pandas_files/fun_with_pandas_21_0.png)
+![png](README_files/README_21_0.png)
     
 
