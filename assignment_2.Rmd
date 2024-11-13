@@ -2,9 +2,12 @@
 title: "Cultural Data Science - Portfolio Assignment 2"
 subtitle: "Daniel Lundgaard"
 output: 
-  html_document:
+  # html_document:
+  #   df_print: paged
+  #   keep_md: true
+  md_document:
+    variant: markdown_github
     df_print: paged
-    keep_md: true
 knit: (function(inputFile, encoding) { 
   rmarkdown::render(
     inputFile,
