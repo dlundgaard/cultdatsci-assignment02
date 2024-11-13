@@ -7,7 +7,7 @@ output:
   #   keep_md: true
   md_document:
     variant: markdown_github
-    df_print: paged
+    df_print: tibble
 knit: (function(inputFile, encoding) { 
   rmarkdown::render(
     inputFile,
