@@ -1,0 +1,220 @@
+---
+title: "Cultural Data Science - Portfolio Assignment 2"
+subtitle: "Daniel Lundgaard"
+output: 
+  html_document:
+    df_print: paged
+    keep_md: true
+knit: (function(inputFile, encoding) { 
+  rmarkdown::render(
+    inputFile,
+    encoding=encoding, 
+    output_file="README.md"
+  )})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+
+library(tidyverse)
+library(ggdist)
+
+COLORS = c("#0B666A", "#1DE9B6", "#7F39FB", "#FF9100", "#27005D", "#00E5FF", "#2979FF", "#F50057")
+options(ggplot2.discrete.colour= list("#7F39FB", "#FF9100", "#27005D", "#2979FF", "#F50057", "#0B666A"))
+
+theme_set(
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(
+      face = "bold", 
+      size = 14,
+      margin = margin(t = 10, r = 0, b = 20, l = 0)
+    ),
+    axis.title.x = element_text(
+      size = 10, 
+      margin = margin(t = 15, r = 0, b = 0, l = 0), 
+      color = "#555555"
+    ),
+    axis.title.y = element_text(
+      size = 10, 
+      margin = margin(t = 0, r = 15, b = 0, l = 0),
+      color = "#555555"
+    )
+  )
+)
+options(digits = 3)
+```
+
+## Part 1.
+- Load the 'divorce_margarine' dataset from the 'dslabs' package. 
+
+```{r}
+dataset.divorce_margarine <- dslabs::divorce_margarine
+dataset.divorce_margarine
+```
+
+- Investigate the correlation between margarine consumption and divorce rates in Maine.
+
+```{r}
+ggplot(dataset.divorce_margarine, aes(x = margarine_consumption_per_capita, y = divorce_rate_maine)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = y ~ x, color = COLORS[5], fill = COLORS[4]) +
+  labs(
+    x = "Margarine Consumption per Capita",
+    y = "Divorce Rate in Maine",
+  )
+```
+
+```{r}
+lm(
+  data = dataset.divorce_margarine,
+  formula = divorce_rate_maine ~ margarine_consumption_per_capita,
+) %>% summary()
+```
+
+Modelling the divorce rate in Maine as a linear function of margarine consumption per capita yields a $R^2$-coefficient of 0.985, seemingly indicating that more than 98% of the variation in divorce rates is accounted for by variation in margarine consumption. 
+
+- Would an increase in the preference for margarine lead to skyrocketing divorce rates?
+
+Trusting the model naïvely would lead to the implication that increased margarine consumption would _cause_ an increase in divorce rates in Maine. However, it seems much more likely that this is a case of spurious correlation, where a statistical relationship has arisen from random natural variations, such that margarine consumption does not, in fact, have any (direct) influence on divorce rates in Maine.
+
+
+## Part 2.
+- Load the ‘GSSvocab’ dataset from the ‘car’ package. This dataset contains people’s scores on an English vocabulary test and includes demographic information.
+
+```{r}
+dataset.car <- carData::GSSvocab
+dataset.car
+```
+
+
+- Filter for the year 1978 and remove rows with missing values (the function na.exclude() is one
+way to do this – check out the documentation!).
+
+```{r}
+dataset.car.1978 <- dataset.car %>% 
+  subset(year == 1978) %>% 
+  drop_na()
+dataset.car.1978
+```
+
+- Is a person’s score on the vocabulary test (‘vocab’) significantly impacted by their level of education (‘educ’)? Visualize the relationship in a plot and build a model. Briefly explain the
+results.
+
+```{r}
+ggplot() +
+  geom_point(
+    data = dataset.car.1978, 
+    aes(x = educ, y = vocab), 
+    size = 2, 
+    alpha = 0.2,
+    position = position_jitter(width = 0.4, height = 0.2), 
+  ) +
+  geom_smooth(
+    data = dataset.car.1978, 
+    aes(x = educ, y = vocab),
+    method = "lm", 
+    formula = y ~ x, 
+    color = COLORS[5], 
+    fill = COLORS[4],
+  ) +
+  scale_x_continuous(breaks = seq(0, 20)) +
+  scale_y_continuous(breaks = seq(0, 10)) +
+  labs(
+    x = "Years of Education",
+    y = "Vocabulary Test Score",
+  )
+```
+
+```{r}
+lm(
+  data = dataset.car.1978, 
+  formula = vocab ~ educ,
+) %>% summary()
+```
+
+Modelling the vocabulary test score as a linear function of level of education indicates that for each additional year of education, we would, all else being equal, predict an increase in vocabulary test score of 0.39, while an individual with 0 education is predicted to score 1.84 on the vocabulary test. However, the relationship is somewhat diffuse with a modest 29% of co-variation being explained by the model.
+
+- Whether a person is the native of an English-speaking country (‘nativeBorn’) could potentially have an impact on the size of their vocabulary. Visualize the relationship and add the predictor to the model. Briefly explain the results.
+
+```{r}
+ggplot(dataset.car.1978) +
+  stat_histinterval(aes(vocab, y = nativeBorn, fill = nativeBorn), alpha = 0.6, na.rm = TRUE, breaks = seq(0, 11), align = 0.5) +
+  scale_fill_manual(breaks = c("no", "yes"), labels =  c("Native", "Second Language"), values = COLORS[5:4]) +
+  scale_y_discrete(labels = c("Second Language", "Native")) +
+  coord_cartesian(ylim = c(1.5, 2)) +
+  scale_x_continuous(breaks = seq(0, 10)) +
+  guides(fill="none") +
+  labs(
+    x = "Vocabulary Test Score",
+    y = "",
+  )
+```
+
+```{r}
+lm(
+  data = dataset.car.1978, 
+  formula = vocab ~ educ + nativeBorn,
+) %>% summary()
+```
+
+It seems that, on average, native speakers score slightly higher on the vocabulary test but vocabulary scores are more uniformly distributed for non-natives, such that the non-natives are more likely to score either very lowly or very highly. 
+
+The linear model would suggest that being a native increases the predicted vocabulary test score by 0.65, although this didn't really notably increase the proportion of variance explained. 
+
+- Does a person’s level of education depend on whether they are a native of the country? Visualize the relationship. 
+
+```{r}
+ggplot(dataset.car.1978) +
+  stat_histinterval(aes(educ, y = nativeBorn, fill = nativeBorn), alpha = 0.6, na.rm = TRUE, breaks = seq(0, 21), align = 0.5) +
+  scale_fill_manual(breaks = c("no", "yes"), labels =  c("Native", "Second Language"), values = COLORS[5:4]) +
+  scale_y_discrete(labels = c("Second Language", "Native")) +
+  coord_cartesian(ylim = c(1.5, 2)) +
+  scale_x_continuous(breaks = seq(0, 20)) +
+  guides(fill="none") +
+  labs(
+    x = "Years of Education",
+    y = "",
+  )
+```
+
+- Do you think it makes sense to add the relationship as an interaction term? Try creating the model and briefly explain the results.
+
+The level of education does not seem to depend on whether one is a native or not. The distributions of education levels don't differ in any meaningful way.
+
+```{r}
+lm(
+  data = dataset.car.1978, 
+  formula = vocab ~ educ * nativeBorn,
+) %>% summary()
+```
+
+By adding an interaction term between nativeness and education, the model finds that, if anything, the effect of education on vocabulary score seems to be marginally smaller for natives, although the parameter estimate is highly uncertain and does not rule out the opposite scenario, i.e. that the effect is in fact larger for natives. 
+
+- Which model performs best?
+
+While adding nativeness and its interaction with education did marginally improve the proportion of variance explained, the interaction term did not allow for better prediction. Thus, the model using years of education as well as nativeness as predictors seems to be the most useful model in this instance. 
+
+This is also the conclusion arrived at if one were to consult an ANOVA model comparison:
+
+```{r}
+anova(
+  lm(
+    data = dataset.car.1978, 
+    formula = vocab ~ educ,
+  ),
+  lm(
+    data = dataset.car.1978, 
+    formula = vocab ~ educ + nativeBorn,
+  ),
+  lm(
+    data = dataset.car.1978, 
+    formula = vocab ~ educ * nativeBorn,
+  )
+)
+```
+
+- When creating plots, try to play around with the options of ggplot2 – add titles and axis labels, and consider using colours.
+
+✔
+
